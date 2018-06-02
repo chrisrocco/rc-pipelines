@@ -7,6 +7,8 @@ import {getConfig} from "./_config";
 import {connectToRabbitMQ} from "./core/messaging/connect";
 import {httpErrorHandler} from "./core/errors/httpErrorHandler";
 import {connectToDB} from "./core/database/connect";
+import {setupListeners} from "./setupListeners";
+import {SERVICES} from "./_service-registry";
 
 /**
  * COMPOSITION ROOT
@@ -23,7 +25,10 @@ export const getApp = async () => {
     let { channel, connection } = await connectToRabbitMQ({ config })
 
     // connect to mysql database
-    const dbConn = connectToDB({ config })
+    const dbConn = await connectToDB({ config })
+
+    // register pipes
+    setupListeners({ registry: SERVICES, dbConn, channel })
 
     // bootstrap express application
     const app = express()

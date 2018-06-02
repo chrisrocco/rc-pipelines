@@ -1,4 +1,4 @@
-import {Pipe} from "./pipes/Pipe";
+import {Pipe} from "./models/Pipe";
 
 const OUTPUT_EX = 'services.events'
 const INPUT_EX = 'services.digest'

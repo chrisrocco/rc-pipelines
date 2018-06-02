@@ -13,17 +13,18 @@ export const setupListeners = ({ registry, dbConn, channel }) => {
     registry.forEach( service => {
         service.events.forEach( async (event) => {
 
-            // binds to all instances of the service
+            // this routing key binds to all instances of the service
             let routingKey = `${service.key}.*.${event.key}`
             let q = await channel.assertQueue('', {exclusive: true})
             channel.bindQueue(q.queue, OUTPUT_EX, routingKey)
             console.log(`listening to (${routingKey}) on exchange (${OUTPUT_EX})`)
 
             let handler = async (msg) => {
-                let pipes = await pipesRepo.find({ event: routingKey })
+                let pipes = await pipesRepo.find({ event: msg.fields.routingKey })
 
-                console.log(`(${routingKey}) => ${msg.content.toString()}`)
-                console.log('...piping message => ', pipes)
+                console.log("\n --- Piping Message ---")
+                console.log(`(${msg.fields.routingKey}) => ${JSON.stringify(pipes.map( P => P.digest), null, 2)}`)
+                console.log("--- End ---")
 
                 pipes.forEach( pipe => {
                     channel.publish(INPUT_EX, pipe.digest, msg.content)

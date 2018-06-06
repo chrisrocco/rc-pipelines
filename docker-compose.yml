@@ -7,7 +7,7 @@ networks:
 
 services:
 
-  app:
+  rc-pipelines:
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -15,14 +15,14 @@ services:
       - ./:/app
     environment:
       RABBITMQ_HOST: rabbitmq
-      MYSQL_HOST: mysql
+      MYSQL_HOST: rc-pipelines-db
       MYSQL_DB: pipes
       MYSQL_USER: root
       MYSQL_PASS: secret
     ports:
-      - 8080:80
+      - 8000:80
 
-  mysql:
+  rc-pipelines-db:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: secret
